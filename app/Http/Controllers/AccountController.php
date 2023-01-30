@@ -11,10 +11,23 @@ class AccountController extends Controller
     {
         //We turn 500 when it falls into any error.
         try {
+            //I throw the total amounts of user_ids in account in the account..
+            $userAmount = Account::where(
+                'user_id',
+                auth('sanctum')->user()->id
+            )->sum('amount');
+
+            $balance = $request->amount;
+
+            if ($userAmount < 0) {
+                $balance = $balance * 0.2;
+                $balance = $request->amount - $balance;
+            }
+
             //I recorded user_id and amount in the account
             //I did it because I couldn't find the user on the session.
             Account::create([
-                'amount' => $request->amount,
+                'amount' => $balance,
                 'user_id' => auth('sanctum')->user()->id,
             ]);
             //I returned the message as json.
@@ -39,7 +52,10 @@ class AccountController extends Controller
     {
         try {
             //I throw the total amounts of user_ids in account in the account..
-            $userAmount = Account::where('user_id', auth('sanctum')->user()->id)->sum('amount');
+            $userAmount = Account::where(
+                'user_id',
+                auth('sanctum')->user()->id
+            )->sum('amount');
             //I wrote the total amount of the money he wanted to withdraw to check if he was greater than -500.
             $userAmount = $userAmount - $request->amount;
 
@@ -86,11 +102,11 @@ class AccountController extends Controller
 
     public function balance()
     {
-        $balance = Account::where("user_id", auth('sanctum')->user()->id)->sum("amount");
-        return response()->json(
-            [
-                "balance" => $balance
-            ]
+        $balance = Account::where('user_id', auth('sanctum')->user()->id)->sum(
+            'amount'
         );
+        return response()->json([
+            'balance' => $balance,
+        ]);
     }
 }
