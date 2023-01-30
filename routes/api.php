@@ -20,3 +20,9 @@ Route::prefix('/user')->group(function () {
     Route::post('/', [UserController::class, 'store']);
     Route::get('/{username}/{password}', [UserController::class, 'show']);
 });
+
+//Grouping was made for Account.
+Route::prefix('/account')->group(function () {
+    Route::post('/deposit', [AccountController::class, 'deposit']);
+    Route::post('/withdraw', [AccountController::class, 'withdraw']);
+});
